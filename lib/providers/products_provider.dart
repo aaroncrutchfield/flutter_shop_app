@@ -28,4 +28,12 @@ class ProductsProvider with ChangeNotifier {
 	Product findById(String productId) {
 		return _products.firstWhere((product) => product.id == productId);
 	}
+
+  void updateProduct(Product editedProduct) {
+		var indexWhere = _products.indexWhere((currentProduct) => currentProduct.id == editedProduct.id);
+		if (indexWhere >= 0) {
+			_products[indexWhere] = editedProduct;
+		}
+		notifyListeners();
+  }
 }
