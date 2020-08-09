@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_shop_app/models/product.dart';
 
 class EditProductScreen extends StatefulWidget {
   static const ROUTE = '/edit-product';
@@ -13,6 +14,15 @@ class _EditProductScreenState extends State<EditProductScreen> {
   final _descriptionFocusNode = FocusNode();
   final _imageUrlFocusNode = FocusNode();
   final _imageUrlController = TextEditingController();
+
+  final _formStateKey = GlobalKey<FormState>();
+  var _editedProduct = Product(
+    id: null,
+    title: '',
+    price: 0,
+    description: '',
+    imageUrl: '',
+  );
 
   @override
   void initState() {
@@ -29,24 +39,35 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
     _imageUrlFocusNode.removeListener(_updateImageUrl);
     _imageUrlFocusNode.dispose();
-
   }
 
   void _updateImageUrl() {
-    if(!_imageUrlFocusNode.hasFocus) {
-      setState(() {
-
-      });
+    if (!_imageUrlFocusNode.hasFocus) {
+      setState(() {});
     }
+  }
+
+  void _saveForm() {
+    _formStateKey.currentState.save();
+    print(_editedProduct.title);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Edit Product')),
+      appBar: AppBar(
+        title: Text('Edit Product'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.save),
+            onPressed: _saveForm,
+          )
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
+          key: _formStateKey,
           child: ListView(
             children: <Widget>[
               TextFormField(
@@ -54,6 +75,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 textInputAction: TextInputAction.next,
                 onFieldSubmitted: (_) =>
                     FocusScope.of(context).requestFocus(_priceFocusNode),
+                onSaved: (titleInput) => _editedProduct = Product(
+                  id: _editedProduct.id,
+                  title: titleInput,
+                  price: _editedProduct.price,
+                  description: _editedProduct.description,
+                  imageUrl: _editedProduct.imageUrl,
+                ),
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Price'),
@@ -62,12 +90,26 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 focusNode: _priceFocusNode,
                 onFieldSubmitted: (_) =>
                     FocusScope.of(context).requestFocus(_descriptionFocusNode),
+                onSaved: (priceInput) => _editedProduct = Product(
+                  id: _editedProduct.id,
+                  title: _editedProduct.title,
+                  price: double.parse(priceInput),
+                  description: _editedProduct.description,
+                  imageUrl: _editedProduct.imageUrl,
+                ),
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Description'),
                 keyboardType: TextInputType.multiline,
                 maxLines: 3,
                 focusNode: _descriptionFocusNode,
+                onSaved: (descriptionInput) => _editedProduct = Product(
+                  id: _editedProduct.id,
+                  title: _editedProduct.title,
+                  price: _editedProduct.price,
+                  description: descriptionInput,
+                  imageUrl: _editedProduct.imageUrl,
+                ),
               ),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -92,10 +134,18 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       textInputAction: TextInputAction.done,
                       controller: _imageUrlController,
                       focusNode: _imageUrlFocusNode,
+                      onFieldSubmitted: (_) => _saveForm(),
+                      onSaved: (urlInput) => _editedProduct = Product(
+                        id: _editedProduct.id,
+                        title: _editedProduct.title,
+                        price: _editedProduct.price,
+                        description: _editedProduct.description,
+                        imageUrl: urlInput,
+                      ),
                     ),
                   )
                 ],
-              )
+              ),
             ],
           ),
         ),
