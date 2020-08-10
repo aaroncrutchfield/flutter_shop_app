@@ -24,7 +24,6 @@ class Product with ChangeNotifier {
 
   Map<String, String> toJson() {
   	return {
-  		'id': id,
   		'title': title,
 		  'description': description,
 		  'price': price.toString(),

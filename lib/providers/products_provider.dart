@@ -17,17 +17,17 @@ class ProductsProvider with ChangeNotifier {
     http.post(
       url,
       body: json.encode(product.toJson()),
-    );
-
-    final newProduct = Product(
-      title: product.title,
-      description: product.description,
-      price: product.price,
-      imageUrl: product.imageUrl,
-      id: DateTime.now().toString(),
-    );
-    _products.add(newProduct);
-    notifyListeners();
+    ).then((response) {
+      final newProduct = Product(
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        imageUrl: product.imageUrl,
+        id: json.decode(response.body)['name'],
+      );
+      _products.add(newProduct);
+      notifyListeners();
+    });
   }
 
   List<Product> get favoriteProducts {
