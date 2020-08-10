@@ -6,6 +6,8 @@ import 'package:flutter_shop_app/models/product.dart';
 import 'package:http/http.dart' as http;
 
 class ProductsProvider with ChangeNotifier {
+  static const url = 'https://flutter-tutorial-a24fd.firebaseio.com/products.json';
+
   List<Product> _products = DUMMY_PRODUCTS;
 
   List<Product> get products {
@@ -13,7 +15,6 @@ class ProductsProvider with ChangeNotifier {
   }
 
   Future<void> addProduct(Product product) async {
-    const url = 'https://flutter-tutorial-a24fd.firebaseio.com/products.json';
     try {
       final response = await http.post(
         url,
@@ -33,6 +34,16 @@ class ProductsProvider with ChangeNotifier {
     } catch (error) {
        print(error);
        throw error;
+    }
+  }
+
+  Future<void> fetchAndSetProducts() async {
+    try {
+      final response = await http.get(url);
+      print(json.decode(response.body));
+    } catch (error) {
+      print(error);
+      throw(error);
     }
   }
 
