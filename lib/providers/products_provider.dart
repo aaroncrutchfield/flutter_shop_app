@@ -1,44 +1,54 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_shop_app/dummy_data.dart';
 import 'package:flutter_shop_app/models/product.dart';
+import 'package:http/http.dart' as http;
 
 class ProductsProvider with ChangeNotifier {
-	List<Product> _products = DUMMY_PRODUCTS;
+  List<Product> _products = DUMMY_PRODUCTS;
 
-	List<Product> get products {
-		return [..._products];
-	}
+  List<Product> get products {
+    return [..._products];
+  }
 
-	void addProduct(Product product) {
-		final newProduct = Product(
-			title: product.title,
-			description: product.description,
-			price: product.price,
-			imageUrl: product.imageUrl,
-			id: DateTime.now().toString(),
-		);
-		_products.add(newProduct);
-		notifyListeners();
-	}
+  void addProduct(Product product) {
+    const url = 'https://flutter-tutorial-a24fd.firebaseio.com/products.json';
+    http.post(
+      url,
+      body: json.encode(product.toJson()),
+    );
 
-	List<Product> get favoriteProducts {
-		return _products.where((product) => product.isFavorite).toList();
-	}
+    final newProduct = Product(
+      title: product.title,
+      description: product.description,
+      price: product.price,
+      imageUrl: product.imageUrl,
+      id: DateTime.now().toString(),
+    );
+    _products.add(newProduct);
+    notifyListeners();
+  }
 
-	Product findById(String productId) {
-		return _products.firstWhere((product) => product.id == productId);
-	}
+  List<Product> get favoriteProducts {
+    return _products.where((product) => product.isFavorite).toList();
+  }
+
+  Product findById(String productId) {
+    return _products.firstWhere((product) => product.id == productId);
+  }
 
   void updateProduct(Product editedProduct) {
-		var indexWhere = _products.indexWhere((currentProduct) => currentProduct.id == editedProduct.id);
-		if (indexWhere >= 0) {
-			_products[indexWhere] = editedProduct;
-		}
-		notifyListeners();
+    var indexWhere = _products
+        .indexWhere((currentProduct) => currentProduct.id == editedProduct.id);
+    if (indexWhere >= 0) {
+      _products[indexWhere] = editedProduct;
+    }
+    notifyListeners();
   }
 
   void deleteProduct(String id) {
-		_products.removeWhere((product) => product.id == id);
-		notifyListeners();
+    _products.removeWhere((product) => product.id == id);
+    notifyListeners();
   }
 }
