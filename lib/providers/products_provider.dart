@@ -5,7 +5,8 @@ import 'package:flutter_shop_app/models/product.dart';
 import 'package:http/http.dart' as http;
 
 class ProductsProvider with ChangeNotifier {
-  static const url = 'https://flutter-tutorial-a24fd.firebaseio.com/products.json';
+  static const url =
+      'https://flutter-tutorial-a24fd.firebaseio.com/products.json';
 
   List<Product> _products = [];
 
@@ -17,7 +18,7 @@ class ProductsProvider with ChangeNotifier {
     try {
       final response = await http.post(
         url,
-        body: json.encode(product.toJson()),
+        body: product.toJson(),
       );
 
       final newProduct = Product(
@@ -29,10 +30,9 @@ class ProductsProvider with ChangeNotifier {
       );
       _products.add(newProduct);
       notifyListeners();
-
     } catch (error) {
-       print(error);
-       throw error;
+      print(error);
+      throw error;
     }
   }
 
@@ -49,7 +49,7 @@ class ProductsProvider with ChangeNotifier {
       print(json.decode(response.body));
     } catch (error) {
       print(error);
-      throw(error);
+      throw (error);
     }
   }
 
@@ -65,7 +65,8 @@ class ProductsProvider with ChangeNotifier {
     var indexWhere = _products
         .indexWhere((currentProduct) => currentProduct.id == editedProduct.id);
     if (indexWhere >= 0) {
-      final url = 'https://flutter-tutorial-a24fd.firebaseio.com/products/${editedProduct.id}.json';
+      final url =
+          'https://flutter-tutorial-a24fd.firebaseio.com/products/${editedProduct.id}.json';
       print(url);
       await http.patch(url, body: editedProduct.toJson());
       _products[indexWhere] = editedProduct;
@@ -74,6 +75,19 @@ class ProductsProvider with ChangeNotifier {
   }
 
   void deleteProduct(String id) {
+    final url =
+        'https://flutter-tutorial-a24fd.firebaseio.com/products/$id.json';
+    final existingIndex = _products.indexWhere((product) => product.id == id);
+    var existingProduct = _products[existingIndex];
+    _products.removeAt(existingIndex);
+
+    http.delete(url)
+        .then((response) {
+          if (response.statusCode >= 400) {
+
+          }
+          return existingProduct = null;
+        });
     _products.removeWhere((product) => product.id == id);
     notifyListeners();
   }
