@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_shop_app/models/http_exception.dart';
+import 'package:http/http.dart' as http;
 
 class Product with ChangeNotifier {
   final String id;
@@ -28,9 +30,25 @@ class Product with ChangeNotifier {
 			  this.isFavorite = toBool(data['isFavorite']);
 
 
-  void toggleFavoriteStatus() {
+  Future<void> toggleFavoriteStatus() async {
+  	final oldStatus = isFavorite;
   	isFavorite = !isFavorite;
   	notifyListeners();
+	  final url = 'https://flutter-tutorial-a24fd.firebaseio.com/products/$id.json';
+	  try {
+	    var response = await http.patch(url, body: this.toJson());
+	    if (response.statusCode >= 400) {
+		    _setFavStatus(oldStatus);
+	    	throw HttpException('Couldn\'t update the favorite status');
+	    }
+	  } catch (error) {
+	    _setFavStatus(oldStatus);
+	  }
+  }
+
+  void _setFavStatus(bool oldStatus) {
+    isFavorite = oldStatus;
+    notifyListeners();
   }
 
   String toJson() {
