@@ -17,6 +17,15 @@ class Product with ChangeNotifier {
 	  this.isFavorite = false,
   });
 
+  Product.fromJson(String id, dynamic data) :
+			  this.id = id,
+			  this.title = data['title'],
+			  this.description = data['description'],
+			  this.price = double.parse(data['price']),
+			  this.imageUrl = data['imageUrl'],
+			  this.isFavorite = toBool(data['isFavorite']);
+
+
   void toggleFavoriteStatus() {
   	isFavorite = !isFavorite;
   	notifyListeners();
@@ -30,5 +39,10 @@ class Product with ChangeNotifier {
 		  'imageUrl': imageUrl,
 		  'isFavorite': isFavorite.toString(),
 	  };
+  }
+
+  static bool toBool(String value) {
+  	if (value == 'true' || value == 'True') return true;
+  	else return false;
   }
 }

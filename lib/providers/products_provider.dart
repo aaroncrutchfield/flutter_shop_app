@@ -1,14 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_shop_app/dummy_data.dart';
 import 'package:flutter_shop_app/models/product.dart';
 import 'package:http/http.dart' as http;
 
 class ProductsProvider with ChangeNotifier {
   static const url = 'https://flutter-tutorial-a24fd.firebaseio.com/products.json';
 
-  List<Product> _products = DUMMY_PRODUCTS;
+  List<Product> _products = [];
 
   List<Product> get products {
     return [..._products];
@@ -40,6 +39,13 @@ class ProductsProvider with ChangeNotifier {
   Future<void> fetchAndSetProducts() async {
     try {
       final response = await http.get(url);
+      final jsonData = json.decode(response.body) as Map<String, dynamic>;
+      final List<Product> loadedProducts = [];
+      jsonData.forEach((productId, productData) {
+        loadedProducts.add(Product.fromJson(productId, productData));
+      });
+      _products = loadedProducts;
+      notifyListeners();
       print(json.decode(response.body));
     } catch (error) {
       print(error);
