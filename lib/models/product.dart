@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 class Product with ChangeNotifier {
@@ -31,14 +33,14 @@ class Product with ChangeNotifier {
   	notifyListeners();
   }
 
-  Map<String, String> toJson() {
-  	return {
+  String toJson() {
+  	return json.encode({
   		'title': title,
 		  'description': description,
 		  'price': price.toString(),
 		  'imageUrl': imageUrl,
 		  'isFavorite': isFavorite.toString(),
-	  };
+	  });
   }
 
   static bool toBool(String value) {

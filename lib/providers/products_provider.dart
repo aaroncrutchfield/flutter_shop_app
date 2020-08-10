@@ -61,10 +61,13 @@ class ProductsProvider with ChangeNotifier {
     return _products.firstWhere((product) => product.id == productId);
   }
 
-  void updateProduct(Product editedProduct) {
+  Future<void> updateProduct(Product editedProduct) async {
     var indexWhere = _products
         .indexWhere((currentProduct) => currentProduct.id == editedProduct.id);
     if (indexWhere >= 0) {
+      final url = 'https://flutter-tutorial-a24fd.firebaseio.com/products/${editedProduct.id}.json';
+      print(url);
+      await http.patch(url, body: editedProduct.toJson());
       _products[indexWhere] = editedProduct;
     }
     notifyListeners();
