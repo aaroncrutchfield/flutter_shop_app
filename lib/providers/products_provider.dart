@@ -12,12 +12,14 @@ class ProductsProvider with ChangeNotifier {
     return [..._products];
   }
 
-  Future<void> addProduct(Product product) {
+  Future<void> addProduct(Product product) async {
     const url = 'https://flutter-tutorial-a24fd.firebaseio.com/products.json';
-    return http.post(
-      url,
-      body: json.encode(product.toJson()),
-    ).then((response) {
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode(product.toJson()),
+      );
+
       final newProduct = Product(
         title: product.title,
         description: product.description,
@@ -27,10 +29,11 @@ class ProductsProvider with ChangeNotifier {
       );
       _products.add(newProduct);
       notifyListeners();
-    }).catchError((error) {
-      // log error
-      throw error;
-    });
+
+    } catch (error) {
+       print(error);
+       throw error;
+    }
   }
 
   List<Product> get favoriteProducts {

@@ -79,7 +79,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
   }
 
-  void _saveForm() {
+  Future<void> _saveForm() async {
     final isValid = _formStateKey.currentState.validate();
     if (!isValid) return;
     _formStateKey.currentState.save();
@@ -91,13 +91,15 @@ class _EditProductScreenState extends State<EditProductScreen> {
       setState(() => _isLoading = false);
       Navigator.of(context).pop();
     } else {
-      Provider.of<ProductsProvider>(context, listen: false)
-          .addProduct(_editedProduct)
-          .catchError((error) => _showErrorDialog())
-          .then((_) {
+      try {
+        await Provider.of<ProductsProvider>(context, listen: false)
+            .addProduct(_editedProduct);
+      } catch (error) {
+        await _showErrorDialog();
+      } finally {
         setState(() => _isLoading = false);
         Navigator.of(context).pop();
-      });
+      }
     }
   }
 
