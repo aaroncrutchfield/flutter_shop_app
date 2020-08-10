@@ -12,9 +12,9 @@ class ProductsProvider with ChangeNotifier {
     return [..._products];
   }
 
-  void addProduct(Product product) {
+  Future<void> addProduct(Product product) {
     const url = 'https://flutter-tutorial-a24fd.firebaseio.com/products.json';
-    http.post(
+    return http.post(
       url,
       body: json.encode(product.toJson()),
     ).then((response) {
