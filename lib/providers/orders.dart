@@ -26,6 +26,35 @@ class OrdersProvider with ChangeNotifier {
     return [..._orders];
   }
 
+  Future<void> fetchAndSetOrders() async {
+    final url = 'https://flutter-tutorial-a24fd.firebaseio.com/orders.json';
+
+    final response = await http.get(url);
+    final List<OrderItem> loadedOrders = [];
+
+    final jsonData = json.decode(response.body) as Map<String, dynamic>;
+    if (jsonData == null) return;
+    jsonData.forEach((orderId, orderData) {
+      loadedOrders.add(
+        OrderItem(
+          id: orderId,
+          amount: orderData['amount'],
+          products: (orderData['products'] as List<dynamic>)
+              .map((cartItem) => CartItem(
+                    id: cartItem['id'],
+                    price: cartItem['price'],
+                    quantity: cartItem['quantity'],
+                    title: cartItem['title'],
+                  )).toList(),
+          dateTime: DateTime.parse(orderData['dateTime']),
+        ),
+      );
+    });
+
+    _orders = loadedOrders.reversed.toList();
+    notifyListeners();
+  }
+
   Future<void> addOrder(List<CartItem> cartProducts, double total) async {
     final url = 'https://flutter-tutorial-a24fd.firebaseio.com/orders.json';
     final timeStamp = DateTime.now();
